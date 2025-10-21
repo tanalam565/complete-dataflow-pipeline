@@ -2,6 +2,8 @@ import streamlit as st
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+import sqlite3
+import pandas as pd
 
 # Load environment variables
 load_dotenv()
@@ -61,9 +63,31 @@ if page == "Upload Documents":
             with st.spinner("Extracting entities..."):
                 entities = extract_entities(text, doc_type)
                 st.success("✅ Entities extracted")
+                
+                # Show confidence score
+                confidence = entities.get('confidence_score', 0)
+                needs_review = entities.get('needs_review', False)
+                
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    if confidence >= 0.7:
+                        st.success(f"Confidence: {confidence*100:.0f}%")
+                    else:
+                        st.warning(f"Confidence: {confidence*100:.0f}%")
+                
+                with col_b:
+                    if needs_review:
+                        st.error("⚠️ NEEDS HUMAN REVIEW")
+                    else:
+                        st.success("✅ Auto-approved")
         
         # Display extracted data
         st.subheader("📊 Extracted Data")
+        
+        # Highlight review status
+        if entities.get('needs_review'):
+            st.warning("⚠️ This document requires human review due to low confidence in extraction.")
+        
         st.json(entities)
         
         # Save to databases

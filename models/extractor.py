@@ -11,16 +11,65 @@ OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
 def extract_entities(text: str, doc_type: str) -> dict:
     """
     Extract entities using OpenRouter API based on document type
+    Returns dict with extracted data and confidence score
     """
     
     if doc_type == 'invoice':
-        return extract_invoice_entities(text)
+        entities = extract_invoice_entities(text)
     elif doc_type == 'insurance':
-        return extract_insurance_entities(text)
+        entities = extract_insurance_entities(text)
     elif doc_type == 'id':
-        return extract_id_entities(text)
+        entities = extract_id_entities(text)
     else:
-        return {'error': 'Unknown document type'}
+        entities = {'error': 'Unknown document type'}
+    
+    # Calculate confidence and add review flag
+    confidence_score = calculate_confidence(entities, doc_type)
+    entities['confidence_score'] = confidence_score
+    entities['needs_review'] = confidence_score < 0.7  # Flag for human review if < 70%
+    
+    return entities
+
+
+def calculate_confidence(entities: dict, doc_type: str) -> float:
+    """
+    Calculate confidence score based on extracted fields
+    Returns score between 0 and 1
+    """
+    if 'error' in entities:
+        return 0.0
+    
+    # Define critical fields for each document type
+    critical_fields = {
+        'invoice': ['invoice_number', 'vendor_name', 'total_amount'],
+        'insurance': ['policy_number', 'policyholder_name', 'coverage_amount'],
+        'id': ['id_number', 'full_name', 'date_of_birth']
+    }
+    
+    # Define important fields
+    important_fields = {
+        'invoice': ['invoice_date', 'due_date', 'vendor_phone'],
+        'insurance': ['expiry_date', 'insurance_company'],
+        'id': ['expiry_date', 'address', 'state']
+    }
+    
+    critical = critical_fields.get(doc_type, [])
+    important = important_fields.get(doc_type, [])
+    
+    # Count filled fields
+    critical_filled = sum(1 for field in critical if entities.get(field) is not None and entities.get(field) != '')
+    important_filled = sum(1 for field in important if entities.get(field) is not None and entities.get(field) != '')
+    
+    # Calculate score
+    if not critical:
+        return 0.5
+    
+    critical_score = critical_filled / len(critical)  # Weight: 80%
+    important_score = important_filled / len(important) if important else 0  # Weight: 20%
+    
+    confidence = (critical_score * 0.8) + (important_score * 0.2)
+    
+    return round(confidence, 2)
 
 
 def call_openrouter(prompt: str) -> str:
@@ -35,7 +84,7 @@ def call_openrouter(prompt: str) -> str:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "google/gemini-2.0-flash-exp:free",  # Free model
+                "model": "google/gemini-2.0-flash-exp:free",
                 "messages": [
                     {
                         "role": "user",
