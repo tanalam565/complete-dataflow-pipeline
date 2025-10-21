@@ -41,7 +41,7 @@ if page == "Upload Documents":
         with col1:
             st.subheader("📄 Document Preview")
             if uploaded_file.type.startswith('image'):
-                st.image(uploaded_file, use_container_width=True)
+                st.image(uploaded_file, use_column_width=True)
             else:
                 st.info("PDF uploaded - processing...")
         
@@ -116,8 +116,8 @@ elif page == "View Database":
     with tab1:
         st.subheader("📄 Invoices")
         invoices = get_all_data('invoice')
-        if invoices:
-            st.dataframe(invoices, use_container_width=True)
+        if not invoices.empty:
+            st.dataframe(invoices, width='stretch')
             st.download_button(
                 "Download CSV",
                 invoices.to_csv(index=False),
@@ -130,8 +130,8 @@ elif page == "View Database":
     with tab2:
         st.subheader("🛡️ Insurance Policies")
         insurance = get_all_data('insurance')
-        if insurance:
-            st.dataframe(insurance, use_container_width=True)
+        if not insurance.empty:
+            st.dataframe(insurance, width='stretch')
             st.download_button(
                 "Download CSV",
                 insurance.to_csv(index=False),
@@ -144,8 +144,8 @@ elif page == "View Database":
     with tab3:
         st.subheader("🪪 IDs")
         ids = get_all_data('id')
-        if ids:
-            st.dataframe(ids, use_container_width=True)
+        if not ids.empty:
+            st.dataframe(ids, width='stretch')
             st.download_button(
                 "Download CSV",
                 ids.to_csv(index=False),

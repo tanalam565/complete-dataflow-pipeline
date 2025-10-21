@@ -35,7 +35,7 @@ def call_openrouter(prompt: str) -> str:
                 "Content-Type": "application/json"
             },
             json={
-                "model": "google/gemini-flash-1.5",  # Free model
+                "model": "google/gemini-2.0-flash-exp:free",  # Free model
                 "messages": [
                     {
                         "role": "user",

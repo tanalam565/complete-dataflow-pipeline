@@ -47,7 +47,7 @@ Respond with ONLY the category name in lowercase, nothing else."""
                 "Content-Type": "application/json"
             },
             json={
-                "model": "google/gemini-flash-1.5",  # Free model
+                "model": "google/gemini-2.0-flash-exp:free",  # Updated free model
                 # Alternative free models:
                 # "meta-llama/llama-3.2-3b-instruct:free"
                 # "qwen/qwen-2-7b-instruct:free"
