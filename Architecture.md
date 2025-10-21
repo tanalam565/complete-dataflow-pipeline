@@ -1,44 +1,17 @@
 # Complete Repository Structure
 
-## Files to Create
-
-```
-property-doc-processor/
-│
-├── .devcontainer/
-│   └── devcontainer.json           # GitHub Codespaces configuration
-│
-├── .streamlit/
-│   └── config.toml                 # Streamlit UI configuration
-│
-├── models/
-│   ├── __init__.py                 # Empty file (makes it a package)
-│   ├── classifier.py               # OpenRouter document classification
-│   └── extractor.py                # OpenRouter entity extraction
-│
-├── database/
-│   ├── __init__.py                 # Empty file (makes it a package)
-│   ├── sqlite_db.py                # SQLite database operations
-│   └── vector_db.py                # ChromaDB vector operations
-│
-├── utils/
-│   ├── __init__.py                 # Empty file (makes it a package)
-│   └── ocr.py                      # OCR text extraction (PDF/images)
-│
-├── data/                           # Created automatically at runtime
-│   ├── property_data.db            # SQLite database (auto-generated)
-│   └── chroma_db/                  # ChromaDB storage (auto-generated)
-│
-├── app.py                          # Main Streamlit application
-├── requirements.txt                # Python dependencies
-├── .env.example                    # Environment variables template
-├── .env                            # Your actual environment variables (add to .gitignore)
-├── .gitignore                      # Git ignore rules
-├── README.md                       # Main documentation
-├── QUICKSTART.md                   # Quick start guide
-└── REPO_STRUCTURE.md               # This file
-```
-
+                                                            Frontend (Streamlit/Gradio)
+                                                                ↓
+                                                            Document Upload
+                                                                ↓
+                                                            Document Classifier (Local AI)
+                                                                ↓
+                                                            Text Extraction (OCR)
+                                                                ↓
+                                                            Entity Extraction (Local LLM)
+                                                                ↓
+                                                            ├── SQLite (tabular data)
+                                                            └── ChromaDB (vector embeddings)
 ## Setup Checklist
 
 ### 1. Create Directory Structure
